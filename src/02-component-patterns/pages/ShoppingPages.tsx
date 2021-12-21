@@ -1,14 +1,14 @@
 import React from 'react';
 import { ProductCard, ProductImage, ProductTitle, ProductButtons} from '../components';
+import { productos } from '../data/products';
+import { useShoppingCart } from '../hooks/useShoppingCart';
 import '../styles/custom-styles.css';
 
-const product = {
-    id:'1',
-    title: ' Coffe Mug - Card',
-    img: './coffee-mug.png'
-}
 
 export const ShoppingPages = () => {
+
+    const { onProductCountChange, shoppingCart } = useShoppingCart();
+ 
     return (
         <div>
             <h1>Shopping Store</h1>
@@ -18,51 +18,50 @@ export const ShoppingPages = () => {
                 flexDirection: 'row',
                 flexWrap: 'wrap'
             }}>
-                {/* El ProductCard es un objeto que tiene el ProductCarHOC en el index.ts */}
 
-                {/*Cuando se usa las propiedades internas de nuetsra componente */}
-                <ProductCard 
-                    product={product}
-                    className='bg-dark text-white'
-                >
-                    <ProductCard.Image className='custom-image'/>
-                    <ProductCard.Title className='text-white text-bold'/>
-                    <ProductCard.Buttons className='custom-buttons'/>
-                </ProductCard>
+                {/* Vamos a duplicar la cantidad de tarjetas por cantidad de productos que nosotros tenemos */}
+                {
+                    productos.map( products => (
+                        <ProductCard 
+                            key={products.id}   
+                            product={products}
+                            className='bg-dark text-white'
+                            onChange={ onProductCountChange}
+                            value={shoppingCart[products.id]?.count || 0}
+                        >
+                            <ProductImage className='custom-image' style={{ boxShadow: '10px 10px 10px rgba(0,0,0,0.2' }}/>
+                            <ProductTitle className='text-white text-bold'/>
+                            <ProductButtons className='custom-buttons'/>
+                        </ProductCard>
+                    ))
+                }
+            </div>
 
-                {/*Cuando hacemos la construccion de los componentes basado en otros componentes hijos*/}
-                <ProductCard 
-                    product={product}
-                    className='bg-dark text-white'
-                >
-                    <ProductImage className='custom-image' style={{ boxShadow: '10px 10px 10px rgba(0,0,0,0.2' }}/>
-                    <ProductTitle className='text-white text-bold'/>
-                    <ProductButtons className='custom-buttons'/>
-                </ProductCard>
-
-                {/* Se utilizaran style en la propiedades del componentes, tiene el beneficio que cuando se tiene una propiedad que cambie
-                    basado en algun valor del estado */}
-                <ProductCard 
-                    product={product}
-                    style={{
-                        backgroundColor: '#70D1F8'
-                    }}
-                >
-                    <ProductImage style={{ boxShadow: '10px 10px 10px rgba(0,0,0,0.2' }}/>
-                    <ProductTitle style={{ fontWeight: 'bold' }}/>
-                    <ProductButtons style={{
-                        display: 'flex',
-                        justifyContent: 'end'
-                    }}/>
-                </ProductCard>
-
+            <div className='shopping-cart'>
+                {
+                    Object.entries(shoppingCart).map( ([key, product]) => (
+                        <ProductCard                         
+                            key={key}
+                            product={product}
+                            className='bg-dark text-white'
+                            style={{width: '100px'}}
+                            onChange={onProductCountChange}
+                            value={product.count} //recibira el numero de veces que se le da click en la tarjeta grande y la manda a la pequeña
+                        >                        
+                            <ProductImage className='custom-image' style={{ boxShadow: '10px 10px 10px rgba(0,0,0,0.2' }}/>
+                            <ProductButtons 
+                                className='custom-buttons'
+                                style={{
+                                    display: 'flex',
+                                    justifyContent:'center'
+                                }}    
+                            />
+                        </ProductCard>
+                        
+                    ))
+                }
             </div>
         </div>
     )
 };
 
-/* Extensible styles:  nos permiten pasarle estilos, clases a los componentes prefabricados y estos puedan implementar esos estilos
-	
-	En la seccion se podra hacer:
-	1. se pueda pasarle el className a cualquier componente.   
-	2. se pueda mandar los style, especificando cualquier estilo.  */
